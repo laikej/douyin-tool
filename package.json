@@ -1,0 +1,28 @@
+{
+  "name": "douyin-script-generator",
+  "version": "1.0.0",
+  "description": "抖音短视频仿写工具 - 输入视频链接和产品信息，自动拆解爆款文案结构、镜头语言、BGM风格，生成可套用的新脚本",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "vercel": "vercel"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "抖音",
+    "短视频",
+    "内容创作",
+    "文案生成"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "vercel": "*"
+  }
+}
