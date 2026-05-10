@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
-const { analyzeScript } = require('../analysis');
+const { analyze } = require('../analysis');
 
 app.post('/api/analyze', (req, res) => {
   try {
@@ -19,7 +19,7 @@ app.post('/api/analyze', (req, res) => {
       });
     }
     
-    const result = analyzeScript(videoInfo, product);
+   const result = analyze(videoInfo, product);
     res.json(result);
   } catch (error) {
     console.error('分析错误:', error);
