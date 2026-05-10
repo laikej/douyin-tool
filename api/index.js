@@ -19,7 +19,13 @@ app.post('/api/analyze', (req, res) => {
       });
     }
     
-   const result = analyze(videoInfo, product);
+    // ✅ 修正：按照 analyze 函数的要求传入一个对象
+    const result = analyze({
+      videoUrl: videoUrl || '',
+      videoContent: videoInfo.content || videoInfo,
+      product: product
+    });
+    
     res.json(result);
   } catch (error) {
     console.error('分析错误:', error);
