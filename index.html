@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>抖音短视频仿写工具 — 爆款内容一键生成</title>
+  <meta name="description" content="输入抖音视频链接和产品信息，自动拆解爆款文案的文案结构、镜头语言、BGM风格，生成可套用的新脚本">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="8" fill="#6366F1"/>
+            <path d="M10 16L14 12L18 16L22 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 20L14 16L18 20L22 16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+          </svg>
+          <div class="logo-text">
+            <span class="logo-title">抖音仿写工具</span>
+            <span class="logo-sub">爆款内容一键生成</span>
+          </div>
+        </div>
+        <div class="header-badge">
+          <span class="badge-dot"></span>
+          Beta v1.0
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+      <!-- Input Section -->
+      <section class="input-section" id="inputSection">
+        <div class="section-header">
+          <h2>输入信息</h2>
+          <p>填入视频链接和产品信息，自动生成仿写方案</p>
+        </div>
+
+        <div class="input-grid">
+          <!-- Video Input Card -->
+          <div class="input-card">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <span>视频内容</span>
+            </div>
+
+            <div class="input-group">
+              <label>抖音视频链接</label>
+              <input type="text" id="videoUrl" placeholder="https://v.douyin.com/xxx 或 douyin.com/video/xxx" autocomplete="off">
+              <p class="input-hint">粘贴视频分享链接，自动解析内容</p>
+            </div>
+
+            <div class="input-divider">
+              <span>或</span>
+            </div>
+
+            <div class="input-group">
+              <label>视频文案内容</label>
+              <textarea id="videoContent" rows="5" placeholder="复制视频中的口播文案/字幕粘贴到这里（自动解析失败时使用）"></textarea>
+            </div>
+
+            <div class="parse-status" id="parseStatus"></div>
+          </div>
+
+          <!-- Product Input Card -->
+          <div class="input-card">
+            <div class="card-header">
+              <div class="card-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+                  <line x1="7" y1="7" x2="7.01" y2="7"/>
+                </svg>
+              </div>
+              <span>产品信息</span>
+            </div>
+
+            <div class="input-group">
+              <label>产品品类 <span class="required">*</span></label>
+              <select id="productCategory">
+                <option value="">请选择品类</option>
+                <option value="女装短袖">女装短袖</option>
+                <option value="男装">男装</option>
+                <option value="美妆">美妆/护肤</option>
+                <option value="食品">食品/零食</option>
+                <option value="数码">数码/电子</option>
+                <option value="家居">家居/家装</option>
+                <option value="其他">其他品类</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label>核心卖点</label>
+              <div class="checkbox-group">
+                <label class="checkbox-item">
+                  <input type="checkbox" name="sellingPoint" value="面料">
+                  <span>面料/材质</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="sellingPoint" value="版型">
+                  <span>版型/设计</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="sellingPoint" value="价格">
+                  <span>价格/性价比</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="sellingPoint" value="场景">
+                  <span>多场景适用</span>
+                </label>
+                <label class="checkbox-item">
+                  <input type="checkbox" name="sellingPoint" value="品牌">
+                  <span>品牌/口碑</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="input-row">
+              <div class="input-group half">
+                <label>价格区间</label>
+                <input type="text" id="priceRange" placeholder="如：59-99元">
+              </div>
+              <div class="input-group half">
+                <label>目标人群</label>
+                <select id="targetAudience">
+                  <option value="">请选择</option>
+                  <option value="学生党">学生党</option>
+                  <option value="年轻白领">年轻白领</option>
+                  <option value="宝妈">宝妈群体</option>
+                  <option value="高消费">高消费人群</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>差异化亮点</label>
+              <textarea id="differentiator" rows="2" placeholder="你的产品与竞品最大的区别是什么？（选填）"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action -->
+        <div class="action-row">
+          <button class="btn-primary" id="analyzeBtn" onclick="startAnalysis()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            <span>开始分析 ▶</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Loading State -->
+      <section class="loading-section" id="loadingSection" style="display:none">
+        <div class="loading-card">
+          <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+          </div>
+          <h3>正在分析中...</h3>
+          <p id="loadingText">解析视频内容</p>
+          <div class="loading-steps">
+            <div class="step-dot active" id="step1"></div>
+            <div class="step-line"></div>
+            <div class="step-dot" id="step2"></div>
+            <div class="step-line"></div>
+            <div class="step-dot" id="step3"></div>
+            <div class="step-line"></div>
+            <div class="step-dot" id="step4"></div>
+          </div>
+          <div class="loading-labels">
+            <span>文案</span>
+            <span>镜头</span>
+            <span>BGM</span>
+            <span>脚本</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Section -->
+      <section class="results-section" id="resultsSection" style="display:none">
+        <!-- Result Tabs -->
+        <div class="result-tabs">
+          <button class="tab-btn active" data-tab="copywriting" onclick="switchTab('copywriting')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            文案拆解
+          </button>
+          <button class="tab-btn" data-tab="shots" onclick="switchTab('shots')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            镜头语言
+          </button>
+          <button class="tab-btn" data-tab="bgm" onclick="switchTab('bgm')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M9 18V5l12-2v13"/>
+              <circle cx="6" cy="18" r="3"/>
+              <circle cx="18" cy="16" r="3"/>
+            </svg>
+            BGM推荐
+          </button>
+          <button class="tab-btn" data-tab="script" onclick="switchTab('script')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="16 18 22 12 16 6"/>
+              <polyline points="8 6 2 12 8 18"/>
+            </svg>
+            新脚本
+          </button>
+        </div>
+
+        <!-- Tab Content: Copywriting -->
+        <div class="tab-content active" id="tab-copywriting">
+          <div class="result-header">
+            <h3>📝 文案结构分析</h3>
+            <div class="result-actions">
+              <button class="btn-action" onclick="copyToClipboard('copywritingContent')">复制文案</button>
+            </div>
+          </div>
+          <div id="copywritingContent"></div>
+        </div>
+
+        <!-- Tab Content: Shots -->
+        <div class="tab-content" id="tab-shots">
+          <div class="result-header">
+            <h3>🎬 镜头语言分析</h3>
+            <div class="result-actions">
+              <button class="btn-action" onclick="copyToClipboard('shotsContent')">复制分镜</button>
+            </div>
+          </div>
+          <div id="shotsContent"></div>
+        </div>
+
+        <!-- Tab Content: BGM -->
+        <div class="tab-content" id="tab-bgm">
+          <div class="result-header">
+            <h3>🎵 BGM 推荐</h3>
+          </div>
+          <div id="bgmContent"></div>
+        </div>
+
+        <!-- Tab Content: Script -->
+        <div class="tab-content" id="tab-script">
+          <div class="result-header">
+            <h3>✍️ 新脚本生成</h3>
+            <div class="result-actions">
+              <button class="btn-action" onclick="exportScript()">导出报告</button>
+              <button class="btn-action primary" onclick="copyToClipboard('scriptContent')">复制脚本</button>
+            </div>
+          </div>
+          <div id="scriptContent"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>基于「抖音爆款文案框架」和「短视频镜头语言体系」构建 · 仅供学习参考</p>
+    </footer>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // State
+    let currentResult = null;
+
+    // DOM Elements
+    const inputSection = document.getElementById('inputSection');
+    const loadingSection = document.getElementById('loadingSection');
+    const resultsSection = document.getElementById('resultsSection');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const loadingText = document.getElementById('loadingText');
+
+    /**
+     * Start analysis
+     */
+    async function startAnalysis() {
+      const videoUrl = document.getElementById('videoUrl').value.trim();
+      const videoContent = document.getElementById('videoContent').value.trim();
+      const category = document.getElementById('productCategory').value;
+      const priceRange = document.getElementById('priceRange').value.trim();
+      const targetAudience = document.getElementById('targetAudience').value;
+      const differentiator = document.getElementById('differentiator').value.trim();
+
+      // Validation
+      if (!category) {
+        showToast('请选择产品品类', 'error');
+        return;
+      }
+      if (!videoUrl && !videoContent) {
+        showToast('请提供视频链接或文案内容', 'error');
+        return;
+      }
+
+      // Get selected selling points
+      const sellingPoints = Array.from(document.querySelectorAll('input[name="sellingPoint"]:checked'))
+        .map(cb => cb.value);
+
+      // Build product object
+      const product = {
+        category,
+        sellingPoints: sellingPoints.length > 0 ? sellingPoints : ['面料', '版型', '百搭'],
+        priceRange: priceRange || '待定',
+        targetAudience: targetAudience ? [targetAudience] : ['女生'],
+        differentiator
+      };
+
+      // Show loading
+      showLoading();
+
+      try {
+        // Call API
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoUrl, videoContent, product })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.error || '分析失败');
+        }
+
+        // Success
+        hideLoading();
+        currentResult = result.data;
+        renderAllResults(result.data);
+        showResults();
+
+      } catch (error) {
+        hideLoading();
+        showToast(error.message || '分析失败，请重试', 'error');
+      }
+    }
+
+    /**
+     * Show loading state
+     */
+    function showLoading() {
+      inputSection.style.display = 'none';
+      loadingSection.style.display = 'flex';
+      resultsSection.style.display = 'none';
+
+      // Animate steps
+      const steps = ['step1', 'step2', 'step3', 'step4'];
+      const texts = ['解析视频内容', '分析文案结构', '解读镜头语言', '生成新脚本'];
+
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i > 0) document.getElementById(steps[i-1]).classList.remove('active');
+        document.getElementById(steps[i]).classList.add('active');
+        loadingText.textContent = texts[i];
+        i++;
+        if (i >= steps.length) clearInterval(interval);
+      }, 600);
+    }
+
+    /**
+     * Hide loading state
+     */
+    function hideLoading() {
+      loadingSection.style.display = 'none';
+    }
+
+    /**
+     * Show results
+     */
+    function showResults() {
+      resultsSection.style.display = 'block';
+      resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    /**
+     * Switch tab
+     */
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.toggle('active', content.id === `tab-${tabName}`);
+      });
+    }
+
+    /**
+     * Render all results
+     */
+    function renderAllResults(data) {
+      renderCopywriting(data.copywritingAnalysis, data.videoInfo);
+      renderShots(data.shotAnalysis);
+      renderBGM(data.bgmRecommendations);
+      renderScript(data.newScript);
+    }
+
+    /**
+     * Render copywriting analysis
+     */
+    function renderCopywriting(analysis, videoInfo) {
+      const container = document.getElementById('copywritingContent');
+      const structure = analysis.structure || {};
+      const template = analysis.template || {};
+
+      container.innerHTML = `
+        <div class="result-grid">
+          <!-- Info Card -->
+          <div class="result-card">
+            <div class="card-label">视频信息</div>
+            <div class="info-row">
+              <span class="info-tag">${videoInfo.platform || '抖音'}</span>
+              <span class="info-text">${videoInfo.account || '未知账号'}</span>
+            </div>
+            ${analysis.content ? `<p class="content-preview">"${analysis.content.substring(0, 80)}..."</p>` : ''}
+          </div>
+
+          <!-- Type Card -->
+          <div class="result-card">
+            <div class="card-label">文案类型</div>
+            <div class="type-badge">${analysis.primaryType || '身份认同型'}</div>
+            <div class="type-detail">
+              <span>钩子类型：${analysis.hookType || '产品引入'}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Structure Breakdown -->
+        <div class="result-card full-width">
+          <div class="card-label">文案结构拆解</div>
+          <div class="structure-flow">
+            <div class="struct-item">
+              <div class="struct-icon">🎣</div>
+              <div class="struct-title">开场钩子</div>
+              <div class="struct-content">${structure.hook || '建立期待，吸引停留'}</div>
+            </div>
+            <div class="struct-arrow">→</div>
+            <div class="struct-item">
+              <div class="struct-icon">💢</div>
+              <div class="struct-title">痛点/共情</div>
+              <div class="struct-content">${structure.painPoint || '戳中用户痛点'}</div>
+            </div>
+            <div class="struct-arrow">→</div>
+            <div class="struct-item">
+              <div class="struct-icon">✨</div>
+              <div class="struct-title">产品卖点</div>
+              <div class="struct-content">${(structure.sellingPoints || []).join(' / ') || '品质·版型·百搭'}</div>
+            </div>
+            <div class="struct-arrow">→</div>
+            <div class="struct-item">
+              <div class="struct-icon">🎯</div>
+              <div class="struct-title">行动指令</div>
+              <div class="struct-content">${structure.cta || '引导购买/互动'}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Template Card -->
+        ${template.name ? `
+        <div class="result-card full-width">
+          <div class="card-label">可套用模板</div>
+          <div class="template-box">
+            <div class="template-name">📋 ${template.name}</div>
+            <div class="template-structure">${template.structure}</div>
+            <div class="template-example">例：${template.example}</div>
+          </div>
+        </div>
+        ` : ''}
+
+        <!-- Copywriting Tips -->
+        <div class="result-card full-width tips-card">
+          <div class="card-label">💡 文案撰写建议</div>
+          <ul class="tips-list">
+            <li>前3秒必须出现核心关键词或痛点，确保完播率</li>
+            <li>产品卖点不超过3个，优先强调最差异化的一点</li>
+            <li>CTA（行动指令）要具体：不要只说"喜欢就买"，要说"左下角链接直接拍"</li>
+            <li>加入真实使用场景描述，增强代入感</li>
+          </ul>
+        </div>
+      `;
+    }
+
+    /**
+     * Render shot analysis
+     */
+    function renderShots(analysis) {
+      const container = document.getElementById('shotsContent');
+      const shots = analysis.shots || [];
+      const summary = analysis.summary || {};
+      const patterns = analysis.patterns || {};
+      const recs = analysis.recommendations || {};
+
+      const shotsHTML = shots.map(shot => `
+        <tr>
+          <td class="shot-time">${shot.time}</td>
+          <td><span class="shot-tag">${shot.shot}</span></td>
+          <td>${shot.movement}</td>
+          <td class="shot-content">${shot.content}</td>
+          <td class="shot-purpose">${shot.purpose}</td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="result-grid">
+          <!-- Summary Card -->
+          <div class="result-card">
+            <div class="card-label">镜头节奏概览</div>
+            <div class="stat-row">
+              <div class="stat">
+                <span class="stat-value">${summary.totalDuration || '~30秒'}</span>
+                <span class="stat-label">总时长</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">${summary.totalShots || shots.length}</span>
+                <span class="stat-label">镜头数</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">${summary.avgShotLength || '2-3秒'}</span>
+                <span class="stat-label">均镜头时长</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Patterns Card -->
+          <div class="result-card">
+            <div class="card-label">镜头规律</div>
+            <div class="pattern-list">
+              <div class="pattern-item">
+                <span class="pattern-label">景别节奏</span>
+                <span class="pattern-value">${patterns.shotSequence || '特写→近景→中景→全景'}</span>
+              </div>
+              <div class="pattern-item">
+                <span class="pattern-label">最常用景别</span>
+                <span class="pattern-value">${patterns.mostUsedShot || '中景 40%'}</span>
+              </div>
+              <div class="pattern-item">
+                <span class="pattern-label">运镜风格</span>
+                <span class="pattern-value">${patterns.movementStyle || '固定为主'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shot Table -->
+        <div class="result-card full-width">
+          <div class="card-label">分镜表</div>
+          <div class="table-wrapper">
+            <table class="shot-table">
+              <thead>
+                <tr>
+                  <th>时间</th>
+                  <th>景别</th>
+                  <th>运镜</th>
+                  <th>内容描述</th>
+                  <th>目的</th>
+                </tr>
+              </thead>
+              <tbody>${shotsHTML}</tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="result-card full-width">
+          <div class="card-label">🎯 拍摄套路清单</div>
+          <div class="recs-grid">
+            <div class="recs-col">
+              <div class="recs-title must">✅ 基础必备镜头</div>
+              <ul class="recs-list">${(recs.mustHave || []).map(r => `<li>${r}</li>`).join('')}</ul>
+            </div>
+            <div class="recs-col">
+              <div class="recs-title nice">⭐ 进价加分镜头</div>
+              <ul class="recs-list">${(recs.niceToHave || []).map(r => `<li>${r}</li>`).join('')}</ul>
+            </div>
+            <div class="recs-col">
+              <div class="recs-title advanced">⭐⭐ 高阶镜头语言</div>
+              <ul class="recs-list">${(recs.advanced || []).map(r => `<li>${r}</li>`).join('')}</ul>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Render BGM recommendations
+     */
+    function renderBGM(bgmData) {
+      const container = document.getElementById('bgmContent');
+      const primary = bgmData.primary || {};
+      const alternatives = bgmData.alternatives || [];
+      const bpmGuide = bgmData.bpmGuide || {};
+
+      const altHTML = alternatives.map(alt => `
+        <div class="bgm-card secondary">
+          <div class="bgm-priority">备选 ${alt.priority}</div>
+          <div class="bgm-name">${alt.name}</div>
+          <div class="bgm-bpm">${alt.bpm} BPM</div>
+          <div class="bgm-desc">${alt.desc}</div>
+          <div class="bgm-examples">适合曲风：${alt.examples?.join(' / ') || '-'}</div>
+        </div>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="result-grid">
+          <!-- Primary BGM -->
+          <div class="result-card full-width">
+            <div class="card-label">🎵 推荐BGM</div>
+            <div class="bgm-card primary">
+              <div class="bgm-badge">首选推荐</div>
+              <div class="bgm-name large">${primary.name || '快节奏流行'}</div>
+              <div class="bgm-bpm large">${primary.bpm || '120-140'} BPM</div>
+              <div class="bgm-desc">${primary.desc || ''}</div>
+              <div class="bgm-examples">适合曲风：${primary.examples?.join(' / ') || '-'}</div>
+              <div class="bgm-reason">推荐理由：${primary.reason || ''}</div>
+            </div>
+          </div>
+
+          ${altHTML ? `
+          <div class="result-card full-width">
+            <div class="card-label">备选BGM</div>
+            <div class="bgm-alts-grid">${altHTML}</div>
+          </div>
+          ` : ''}
+
+          <!-- BPM Guide -->
+          <div class="result-card full-width">
+            <div class="card-label">🎛️ BGM使用指南</div>
+            <div class="bpm-guide">
+              <div class="guide-item">
+                <div class="guide-icon">⏱️</div>
+                <div class="guide-text">
+                  <div class="guide-title">节奏范围</div>
+                  <div class="guide-value">${bpmGuide.range || '90-130 BPM'}</div>
+                </div>
+              </div>
+              <div class="guide-item">
+                <div class="guide-icon">🔄</div>
+                <div class="guide-text">
+                  <div class="guide-title">换装卡点</div>
+                  <div class="guide-value">${bpmGuide.switchPoint || '换装/转身动作与重拍对齐'}</div>
+                </div>
+              </div>
+              <div class="guide-item">
+                <div class="guide-icon">🔇</div>
+                <div class="guide-text">
+                  <div class="guide-title">CTA处理</div>
+                  <div class="guide-value">${bpmGuide.ctaTip || '结尾字幕出现时BGM降低20-30%音量'}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Usage Tips -->
+          <div class="result-card full-width tips-card">
+            <div class="card-label">💡 BGM使用技巧</div>
+            <ul class="tips-list">
+              <li>选择发布前3天内抖音热歌榜歌曲，可蹭自然流量</li>
+              <li>版权音乐不会影响推荐，但会影响收益（如有）</li>
+              <li>卡点剪辑：踩着音乐重拍（鼓点）切换镜头，效果最佳</li>
+              <li>可用剪映"自动踩点"功能快速对齐节奏</li>
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+
+    /**
+     * Render new script
+     */
+    function renderScript(scriptData) {
+      const container = document.getElementById('scriptContent');
+      const product = scriptData.product || {};
+      const shots = scriptData.shotScript?.shots || [];
+      const suggestions = scriptData.shootingSuggestions || {};
+
+      const shotsHTML = shots.map((shot, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td class="shot-time">${shot.time}</td>
+          <td><span class="shot-tag">${shot.shot}</span></td>
+          <td>${shot.movement}</td>
+          <td class="shot-content">${shot.content || shot.adjustableContent}</td>
+        </tr>
+      `).join('');
+
+      container.innerHTML = `
+        <!-- Product Info -->
+        <div class="result-card full-width">
+          <div class="card-label">📦 产品信息</div>
+          <div class="product-info-grid">
+            <div class="product-item">
+              <span class="product-label">品类</span>
+              <span class="product-value">${product.category || '-'}</span>
+            </div>
+            <div class="product-item">
+              <span class="product-label">价格</span>
+              <span class="product-value">${product.priceRange || '-'}</span>
+            </div>
+            <div class="product-item">
+              <span class="product-label">卖点</span>
+              <span class="product-value">${(product.sellingPoints || []).join(' / ') || '-'}</span>
+            </div>
+            <div class="product-item">
+              <span class="product-label">人群</span>
+              <span class="product-value">${(product.targetAudience || []).join(' / ') || '-'}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- New Copywriting Script -->
+        <div class="result-card full-width">
+          <div class="card-label">📝 新文案脚本</div>
+          <div class="script-text">${(scriptData.copywritingScript || '').replace(/\n/g, '<br>')}</div>
+        </div>
+
+        <!-- New Shot Script -->
+        <div class="result-card full-width">
+          <div class="card-label">🎬 新分镜脚本（共${shots.length}个镜头）</div>
+          <div class="table-wrapper">
+            <table class="shot-table">
+              <thead>
+                <tr><th>#</th><th>时间</th><th>景别</th><th>运镜</th><th>内容</th></tr>
+              </thead>
+              <tbody>${shotsHTML}</tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Shooting Suggestions -->
+        <div class="result-card full-width">
+          <div class="card-label">📋 拍摄建议</div>
+          <div class="suggestions-grid">
+            <div class="suggestion-col">
+              <div class="sug-title">📍 场地</div>
+              <ul class="sug-list">${(suggestions.location || []).map(s => `<li>${s}</li>`).join('')}</ul>
+            </div>
+            <div class="suggestion-col">
+              <div class="sug-title">👩 模特</div>
+              <ul class="sug-list">${(suggestions.model || []).map(s => `<li>${s}</li>`).join('')}</ul>
+            </div>
+            <div class="suggestion-col">
+              <div class="sug-title">🎭 道具</div>
+              <ul class="sug-list">${(suggestions.props || []).map(s => `<li>${s}</li>`).join('')}</ul>
+            </div>
+            <div class="suggestion-col">
+              <div class="sug-title">💡 灯光</div>
+              <ul class="sug-list">${(suggestions.lighting || []).map(s => `<li>${s}</li>`).join('')}</ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Tips -->
+        <div class="result-card full-width tips-card">
+          <div class="card-label">✂️ 剪辑建议</div>
+          <ul class="tips-list">${(suggestions.edit || []).map(t => `<li>${t}</li>`).join('')}</ul>
+        </div>
+
+        <!-- General Tips -->
+        <div class="result-card full-width tips-card">
+          <div class="card-label">💡 拍摄小贴士</div>
+          <ul class="tips-list">${(scriptData.tips || []).map(t => `<li>${t}</li>`).join('')}</ul>
+        </div>
+      `;
+    }
+
+    /**
+     * Copy to clipboard
+     */
+    async function copyToClipboard(elementId) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+
+      // Extract text from the element
+      const text = el.innerText || el.textContent || '';
+      if (!text.trim()) {
+        showToast('没有内容可复制', 'error');
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('已复制到剪贴板', 'success');
+      } catch (err) {
+        // Fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('已复制到剪贴板', 'success');
+      }
+    }
+
+    /**
+     * Export script as markdown
+     */
+    function exportScript() {
+      if (!currentResult) return;
+
+      const script = currentResult.newScript;
+      const analysis = currentResult.copywritingAnalysis;
+
+      let md = `# 抖音短视频仿写报告\n\n`;
+      md += `> 生成时间：${new Date().toLocaleString('zh-CN')}\n\n`;
+
+      md += `## 产品信息\n`;
+      md += `- **品类**：${script.product?.category || '-'}\n`;
+      md += `- **价格**：${script.product?.priceRange || '-'}\n`;
+      md += `- **卖点**：${(script.product?.sellingPoints || []).join(' / ') || '-'}\n`;
+      md += `- **人群**：${(script.product?.targetAudience || []).join(' / ') || '-'}\n\n`;
+
+      md += `## 文案拆解\n`;
+      md += `- **文案类型**：${analysis.primaryType || '-'}\n`;
+      md += `- **钩子类型**：${analysis.hookType || '-'}\n`;
+      md += `- **核心结构**：${analysis.structure?.hook || ''} → ${analysis.structure?.painPoint || ''} → ${(analysis.structure?.sellingPoints || []).join(' / ') || ''}\n\n`;
+
+      md += `## 新文案脚本\n\n${script.copywritingScript || ''}\n\n---\n\n`;
+
+      md += `## 分镜脚本（共${script.shotScript?.shots?.length || 0}个镜头）\n\n`;
+      md += `| # | 时间 | 景别 | 运镜 | 内容 |\n`;
+      md += `|---|------|------|------|------|\n`;
+      (script.shotScript?.shots || []).forEach((shot, i) => {
+        md += `| ${i+1} | ${shot.time} | ${shot.shot} | ${shot.movement} | ${shot.content || shot.adjustableContent} |\n`;
+      });
+
+      md += `\n## 拍摄建议\n\n`;
+      md += `### 场地\n${(script.shootingSuggestions?.location || []).map(s => `- ${s}`).join('\n')}\n\n`;
+      md += `### 模特\n${(script.shootingSuggestions?.model || []).map(s => `- ${s}`).join('\n')}\n\n`;
+      md += `### 道具\n${(script.shootingSuggestions?.props || []).map(s => `- ${s}`).join('\n')}\n\n`;
+      md += `### 灯光\n${(script.shootingSuggestions?.lighting || []).map(s => `- ${s}`).join('\n')}\n\n`;
+
+      md += `## BGM推荐\n`;
+      md += `- **首选**：${currentResult.bgmRecommendations?.primary?.name || '-'} (${currentResult.bgmRecommendations?.primary?.bpm || ''})\n`;
+      md += `- **适合曲风**：${currentResult.bgmRecommendations?.primary?.examples?.join(' / ') || '-'}\n\n`;
+
+      md += `---\n*由抖音短视频仿写工具自动生成*\n`;
+
+      // Download
+      const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `仿写脚本_${script.product?.category || '视频'}_${Date.now()}.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      showToast('报告已下载', 'success');
+    }
+
+    /**
+     * Show toast notification
+     */
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      // Animate in
+      requestAnimationFrame(() => toast.classList.add('show'));
+
+      // Remove after 3s
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
