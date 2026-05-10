@@ -19,7 +19,6 @@ app.post('/api/analyze', (req, res) => {
       });
     }
     
-    // ✅ 修正：按照 analyze 函数的要求传入一个对象
     const result = analyze({
       videoUrl: videoUrl || '',
       videoContent: videoInfo.content || videoInfo,
